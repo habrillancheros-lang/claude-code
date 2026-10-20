@@ -58,6 +58,31 @@ bun run start -- -p "Hello Claude"
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Your Anthropic API key (required to use Claude) |
 | `FEATURE_FLAGS` | Comma-separated list of feature flags to enable (e.g., `KAIROS,VOICE_MODE`) |
+| `CLAUDE_CODE_WEB_SEARCH_PROVIDER` | `parallel` or `anthropic`; unset uses Parallel for searches without domain filters |
+
+### Web Search
+
+The built-in `WebSearch` tool uses [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp)
+for searches without domain filters. Search runs in Fast mode through the anonymous
+endpoint, with no Parallel account or search API key required. Existing `WebSearch`
+permission rules and MCP allowlists, denylists and disabled-server settings still
+apply (server name: `parallel-search`). The built-in connection is unavailable when
+`managed-mcp.json` exclusively controls MCP servers; use the configured MCP tools
+or select Anthropic search in that case. Search errors are returned without trying another
+provider; requests time out after 60 seconds and stop when the conversation is cancelled.
+
+Set `CLAUDE_CODE_WEB_SEARCH_PROVIDER=anthropic` to keep using the original Anthropic
+search implementation and its supported model providers. When the setting is unset,
+requests with `allowed_domains` or `blocked_domains` continue to use Anthropic search.
+Explicit `parallel` selection rejects these filters because the anonymous endpoint
+does not support native domain-filter settings. Existing MCP server configurations
+continue to work independently. This change routes only `WebSearch`; `WebFetch` keeps
+its existing implementation.
+
+Run the focused caller tests with `bun test tests/webSearch.test.ts`. They exercise
+the production tool and MCP SDK against protocol fixtures. To additionally run a
+live anonymous search, set `PARALLEL_LIVE_SEARCH=1` and select the `live anonymous`
+test with Bun's `--test-name-pattern` option.
 
 ### Notes
 
