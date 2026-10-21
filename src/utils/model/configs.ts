@@ -27,7 +27,7 @@ export const CLAUDE_3_5_HAIKU_CONFIG = {
   bedrock: 'us.anthropic.claude-3-5-haiku-20241022-v1:0',
   vertex: 'claude-3-5-haiku@20241022',
   foundry: 'claude-3-5-haiku',
-  minimax: 'MiniMax-M2.7',
+  minimax: 'MiniMax-M3',
 } as const satisfies ModelConfig
 
 export const CLAUDE_HAIKU_4_5_CONFIG = {
@@ -35,7 +35,7 @@ export const CLAUDE_HAIKU_4_5_CONFIG = {
   bedrock: 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
   vertex: 'claude-haiku-4-5@20251001',
   foundry: 'claude-haiku-4-5',
-  minimax: 'MiniMax-M2.7',
+  minimax: 'MiniMax-M3.1-Flash',
 } as const satisfies ModelConfig
 
 export const CLAUDE_SONNET_4_CONFIG = {
@@ -51,7 +51,7 @@ export const CLAUDE_SONNET_4_5_CONFIG = {
   bedrock: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
   vertex: 'claude-sonnet-4-5@20250929',
   foundry: 'claude-sonnet-4-5',
-  minimax: 'MiniMax-M3',
+  minimax: 'MiniMax-M3.1-Flash',
 } as const satisfies ModelConfig
 
 export const CLAUDE_OPUS_4_CONFIG = {
@@ -91,7 +91,7 @@ export const CLAUDE_SONNET_4_6_CONFIG = {
   bedrock: 'us.anthropic.claude-sonnet-4-6',
   vertex: 'claude-sonnet-4-6',
   foundry: 'claude-sonnet-4-6',
-  minimax: 'MiniMax-M3',
+  minimax: 'MiniMax-M3.1-Flash',
 } as const satisfies ModelConfig
 
 // @[MODEL LAUNCH]: Register the new config here.

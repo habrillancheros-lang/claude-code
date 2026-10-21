@@ -1,9 +1,17 @@
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
 import { isEnvTruthy } from '../envUtils.js'
 
-export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry' | 'minimax'
+export type APIProvider =
+  | 'firstParty'
+  | 'bedrock'
+  | 'vertex'
+  | 'foundry'
+  | 'minimax'
 
 const MINI_MAX_ANTHROPIC_HOSTS = new Set(['api.minimax.io', 'api.minimaxi.com'])
+
+export const MINIMAX_FLASH_MODEL = 'MiniMax-M3.1-Flash'
+export const MINIMAX_M3_MODEL = 'MiniMax-M3'
 
 function getAnthropicBaseUrlHost(): string | null {
   const baseUrl = process.env.ANTHROPIC_BASE_URL
@@ -17,23 +25,29 @@ function getAnthropicBaseUrlHost(): string | null {
   }
 }
 
+export function isMiniMaxAnthropicBaseUrl(): boolean {
+  const host = getAnthropicBaseUrlHost()
+  return host !== null && MINI_MAX_ANTHROPIC_HOSTS.has(host)
+}
+
 export function getAPIProvider(): APIProvider {
-  return isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)
-    ? 'bedrock'
-    : isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)
-      ? 'vertex'
-      : isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
-        ? 'foundry'
-        : 'firstParty'
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)) {
+    return 'bedrock'
+  }
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)) {
+    return 'vertex'
+  }
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)) {
+    return 'foundry'
+  }
+  if (isMiniMaxAnthropicBaseUrl()) {
+    return 'minimax'
+  }
+  return 'firstParty'
 }
 
 export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
   return getAPIProvider() as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
-}
-
-export function isMiniMaxAnthropicBaseUrl(): boolean {
-  const host = getAnthropicBaseUrlHost()
-  return host !== null && MINI_MAX_ANTHROPIC_HOSTS.has(host)
 }
 
 /**
@@ -42,11 +56,15 @@ export function isMiniMaxAnthropicBaseUrl(): boolean {
  * (or api-staging.anthropic.com for ant users).
  */
 export function isFirstPartyAnthropicBaseUrl(): boolean {
-  const host = getAnthropicBaseUrlHost()
-  if (!host) {
+  const baseUrl = process.env.ANTHROPIC_BASE_URL
+  if (!baseUrl) {
     return true
   }
-  const allowedHosts = ['api.anthropic.com', ...MINI_MAX_ANTHROPIC_HOSTS]
+  const host = getAnthropicBaseUrlHost()
+  if (!host) {
+    return false
+  }
+  const allowedHosts = ['api.anthropic.com']
   if (process.env.USER_TYPE === 'ant') {
     allowedHosts.push('api-staging.anthropic.com')
   }
